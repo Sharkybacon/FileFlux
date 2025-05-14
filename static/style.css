@@ -1,0 +1,226 @@
+
+try:
+    import os
+    import json
+    from http.server import SimpleHTTPRequestHandler, HTTPServer
+    from urllib.parse import unquote
+    from io import BytesIO
+    import socket
+except ModuleNotFoundError as e:
+    print(f'Module not found: {e}. Please ensure all necessary packages are installed.')
+    exit(1)
+
+# Load configuration
+CONFIG_PATH = 'config.json'
+
+def load_config():
+    try:
+        if not os.path.exists(CONFIG_PATH):
+            # Create a default config file if not found
+            default_config = {'port': 8000, 'root_dir': 'static'}
+            with open(CONFIG_PATH, 'w') as f:
+                json.dump(default_config, f, indent=4)
+            print(f'Configuration file created at {CONFIG_PATH} with default settings.')
+        with open(CONFIG_PATH, 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f'Error loading configuration: {e}')
+        return {'port': 8000, 'root_dir': 'static'}
+
+config = load_config()
+PORT = config.get('port', 8000)
+ROOT_DIR = config.get('root_dir', 'static')
+
+# Ensure directory structure
+def setup_directories():/* static/style.css */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+header {
+    background-color: #0078d4;
+    color: white;
+    padding: 1rem 2rem;
+    text-align: center;
+}
+
+.container {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+#file-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#file-list li {
+    padding: 0.5rem 1rem;
+    background-color: white;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#file-list a {
+    text-decoration: none;
+    color: #0078d4;
+    font-weight: bold;
+}
+
+#file-list a:hover {
+    text-decoration: underline;
+}
+
+.upload-form {
+    margin-bottom: 2rem;
+}
+
+.upload-form input[type="file"] {
+    margin-bottom: 1rem;
+}
+
+button {
+    padding: 0.5rem 1rem;
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #005a9e;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-top: 3rem;
+}
+    try:
+        os.makedirs(ROOT_DIR, exist_ok=True)
+        os.makedirs('templates', exist_ok=True)
+        os.makedirs('static', exist_ok=True)
+        
+        # Create index.html in templates
+        index_html = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Server</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Welcome to the File Server</h1>
+    <div id="file-list">
+        <h2>Files:</h2>
+        <ul>
+            {file_list}
+        </ul>
+    </div>
+</body>
+</html>'''
+        
+        with open('templates/index.html', 'w') as f:
+            f.write(index_html)
+        
+        # Create style.css in static
+        style_css = '''body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+h1 {
+    color: #333;
+}
+#file-list {
+    margin-top: 20px;
+}
+a {
+    text-decoration: none;
+    color: #0066cc;
+}
+a:hover {
+    text-decoration: underline;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+li {
+    margin: 5px 0;
+}'''
+        
+        with open('static/style.css', 'w') as f:
+            f.write(style_css)
+
+        print('Directory structure and template files created successfully.')
+    except Exception as e:
+        print(f'Error creating directories or files: {e}')
+
+setup_directories()
+
+class FileServerHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        # Decode URL and set root directory
+        self.path = unquote(self.path)
+        if self.path == '/' or self.path == '/index.html':
+            self.path = 'templates/index.html'
+        
+        # Serve the file or directory listing
+        if os.path.isdir(self.path):
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            files = os.listdir(self.path)
+            file_list = ''.join(f'<li><a href="{file}">{file}</a></li>' for file in files)
+            response = open('templates/index.html').read().format(file_list=file_list)
+            self.wfile.write(response.encode('utf-8'))
+        else:
+            super().do_GET()
+
+    def do_POST(self):
+        # Handle file uploads
+        content_length = int(self.headers['Content-Length'])
+        field_data = self.rfile.read(content_length)
+        filename = self.headers.get('Filename', 'uploaded_file')
+        filepath = os.path.join(ROOT_DIR, filename)
+
+        with open(filepath, 'wb') as f:
+            f.write(field_data)
+        
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(f'File {filename} uploaded successfully.'.encode('utf-8'))
+
+def run_server():
+    try:
+        # Explicitly set the socket options to support IPv4 and IPv6
+        server_address = ('', PORT)
+        httpd = HTTPServer(server_address, FileServerHandler)
+        httpd.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        print(f'Serving HTTP on port {PORT}...')
+        httpd.serve_forever()
+    except OSError as e:
+        print(f'Error starting server: {e}')
+
+if __name__ == '__main__':
+    run_server()
