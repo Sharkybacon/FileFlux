@@ -22,18 +22,14 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 class FileServer(SimpleHTTPRequestHandler):
     def do_GET(self):
-        print(f"Handling GET request for path: {self.path}")  # 调试信息
-
         if self.path in ['/', '/index.html']:
             template_dir = os.path.abspath(os.path.dirname(__file__))
             index_path = os.path.join(template_dir, 'templates', 'index.html')
-            print(f"Trying to load template from: {index_path}")  # 调试信息
 
             if not os.path.exists(index_path):
                 self.send_error(404, f"Template file not found: {index_path}")
                 return
 
-            # 读取模板文件内容并返回
             with open(index_path, 'rb') as f:
                 content = f.read()
 
@@ -44,12 +40,34 @@ class FileServer(SimpleHTTPRequestHandler):
             self.wfile.write(content)
             return
 
-        if self.path.startswith('/list'):
+        elif self.path.startswith('/list'):
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
             files = os.listdir(UPLOAD_DIR)
             self.wfile.write(json.dumps(files).encode())
+            return
+
+        elif self.path.startswith('/details/'):
+            filename = unquote(self.path[len('/details/'):])
+            filepath = os.path.join(UPLOAD_DIR, filename)
+
+            if os.path.exists(filepath):
+                file_stats = os.stat(filepath)
+                details = {
+                    "name": filename,
+                    "size": file_stats.st_size,
+                    "last_modified": file_stats.st_mtime
+                }
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, **details}).encode())
+            else:
+                self.send_response(404)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": "File not found"}).encode())
             return
 
         elif os.path.isfile(os.path.join(UPLOAD_DIR, self.path.strip("/"))):
@@ -70,6 +88,22 @@ class FileServer(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(b'File not found')
 
+    def do_DELETE(self):
+        filename = unquote(self.path[len('/delete/'):])
+        filepath = os.path.join(UPLOAD_DIR, filename)
+
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": True, "message": f'File {filename} deleted'}).encode())
+        else:
+            self.send_response(404)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"success": False, "error": "File not found"}).encode())
+
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
         filename = self.headers.get('Filename', 'uploaded_file')
@@ -80,7 +114,7 @@ class FileServer(SimpleHTTPRequestHandler):
 
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(f'File {filename} uploaded successfully'.encode())
+        self.wfile.write(json.dumps({"success": True, "message": f'File {filename} uploaded'}).encode())
 
 def run_server():
     server_address = ('', PORT)
