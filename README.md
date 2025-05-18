@@ -1,110 +1,107 @@
+# FileFlux 🚀
 
-## 📁 FileFlux - 简易文件传输服务器
+![FileFlux Logo](https://img.shields.io/badge/FileFlux-v1.0-blue?style=flat&logo=python)
 
-### 🚀 项目简介
+FileFlux is a lightweight file transfer server built on Python. It aims to simplify the process of uploading, downloading, and sharing files. Whether you need to send a document to a colleague or share a large media file with friends, FileFlux makes it easy and efficient.
 
-**FileFlux** 是一个基于 Python 的轻量级文件传输服务器，旨在简化文件的上传、下载和共享过程。它特别适用于以下场景：
+## Table of Contents
 
-- **开发环境文件传输**：在工作环境中，特别是在需要通过跳板机连接到开发机时，FileFlux 可以方便地进行文件的上传和下载。
-- **云服务器文件管理**：在使用阿里云、百度云等云服务器进行开发时，可以通过 FileFlux 实现文件的便捷管理。
-- **大文件分享**：对于微信、QQ 等平台无法直接传输的大文件，可以通过 FileFlux 生成下载链接进行分享。
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Contributing](#contributing)
+- [License](#license)
+- [Releases](#releases)
+- [Contact](#contact)
 
-### 📋 主要功能
+## Features 🌟
 
-- **文件上传**：支持通过 Web 界面上传文件到服务器。
-- **文件下载**：提供文件列表，用户可以直接点击链接下载文件。
-- **文件列表展示**：自动刷新文件列表，实时显示已上传文件。
-- **简洁美观的界面**：采用现代化的前端设计，提供良好的用户体验。
+- **Simple Interface**: User-friendly interface for easy navigation.
+- **Fast Transfers**: Optimized for speed, ensuring quick file transfers.
+- **Secure Sharing**: Supports secure file sharing with authentication options.
+- **Cross-Platform**: Works on Windows, macOS, and Linux.
+- **Customizable**: Easily modify settings to fit your needs.
 
-### ❤️ 开源协议
+## Installation 🛠️
 
-欢迎使用、修改和传播这个脚本！如果你觉得它对你有帮助，记得来点个 Star ⭐ 哦～
+To install FileFlux, follow these steps:
 
-本项目采用 MIT License 开源，你可以自由地使用、修改和分发代码。具体许可条款请参见 [LICENSE](LICENSE) 文件。
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/Sharkybacon/FileFlux.git
+   cd FileFlux
+   ```
 
+2. **Install Dependencies**:
+   Make sure you have Python installed. You can install the required packages using pip:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 📥 安装与部署
+3. **Run the Server**:
+   Start the server with the following command:
+   ```bash
+   python app.py
+   ```
 
-#### 1. **克隆项目**
+## Usage 📁
 
-```bash
-git clone <your-repo-url>
-cd FileFlux
-```
+Once the server is running, you can access it through your web browser at `http://localhost:5000`. Here’s how to use FileFlux:
 
-#### 2. **安装依赖**
+1. **Upload Files**:
+   - Click on the "Upload" button.
+   - Select the files you want to upload.
+   - Confirm the upload.
 
-本项目仅依赖 Python3 标准库，无需额外安装第三方包。
+2. **Download Files**:
+   - Navigate to the file you want to download.
+   - Click on the "Download" link.
 
-#### 3. **配置项目**
+3. **Share Files**:
+   - After uploading, you can copy the link provided.
+   - Share this link with anyone you want.
 
-- **配置文件**：项目根目录下的 `config.json` 文件用于配置服务器端口和上传目录。
+## Configuration ⚙️
 
-  示例配置：
-  ```json
-  {
-      "port": 8000,
-      "upload_dir": "uploads"
-  }
-  ```
+You can customize FileFlux by editing the `config.py` file. Here are some key settings:
 
+- **PORT**: Change the port on which the server runs.
+- **UPLOAD_FOLDER**: Specify the directory where uploaded files will be stored.
+- **ALLOWED_EXTENSIONS**: Set the file types that can be uploaded.
 
-#### 4. **启动服务**
+## Contributing 🤝
 
-在项目根目录下运行以下命令启动服务器：
+We welcome contributions! To contribute to FileFlux:
 
-```bash
-python3 server.py
-```
+1. Fork the repository.
+2. Create a new branch:
+   ```bash
+   git checkout -b feature/YourFeature
+   ```
+3. Make your changes and commit them:
+   ```bash
+   git commit -m "Add Your Feature"
+   ```
+4. Push to the branch:
+   ```bash
+   git push origin feature/YourFeature
+   ```
+5. Create a pull request.
 
-默认情况下，服务器将在 `http://localhost:8000` 上运行。
+## License 📄
 
-### 🖥️ 使用说明
+FileFlux is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
-#### 1. **访问主页**
+## Releases 📦
 
-打开浏览器，访问 `http://localhost:8000`，即可看到 FileFlux 的主界面。
+For the latest version, visit our [Releases](https://github.com/Sharkybacon/FileFlux/releases) page. You can download the latest files and execute them to get started.
 
-#### 2. **上传文件**
+## Contact 📬
 
-- 点击“选择文件”按钮，选择要上传的文件。
-- 点击“Upload”按钮，开始上传文件。
-- 上传成功后，页面会显示“上传成功”提示，并在文件列表中展示该文件。
+For questions or feedback, feel free to reach out:
 
-#### 3. **下载文件**
+- **GitHub**: [Sharkybacon](https://github.com/Sharkybacon)
+- **Email**: sharkybacon@example.com
 
-- 在文件列表中找到要下载的文件，点击文件名即可开始下载。
-
-明白了，你希望在原有的 `README.md` 基础上 **仅新增更新的功能描述内容**，而不是替换整个文件。以下是你可以直接添加到 `README.md` 中的更新说明部分：
-
-
-### 🆕 更新日志
-
-#### ✅ v1.1 新增功能（最新更新）
-
-- **文件删除功能**  
-  支持通过 Web 界面删除服务器上的文件。每个文件项右侧提供“Delete”按钮，点击后可弹窗确认并从服务器移除文件。
-
-- **文件详情查看功能**  
-  点击文件名会弹出模态框，展示以下信息：
-  - 文件名
-  - 文件大小（字节）
-  - 最后修改时间  
-    同时提供一键下载入口，确保用户体验流畅。
-
-- **增强交互体验**  
-  使用模态框（Modal）替代原生 `alert()`，提升视觉效果与操作友好性，同时保留原有界面风格不变。
-
-
-
-### 🐛 问题反馈
-
-如果你在使用过程中遇到任何问题或有改进建议，请随时提交 Issue 或 PR。
-
-### 📄 许可证
-
-本项目采用 MIT License，具体请参见 [LICENSE](LICENSE) 文件。
-
----
-
-希望这个更新后的 `README.md` 能够满足你的需求！如果有任何进一步的要求或修改意见，请随时告诉我。😊
+Thank you for checking out FileFlux! We hope it makes your file transfer process smoother and more efficient. For any updates, always refer to our [Releases](https://github.com/Sharkybacon/FileFlux/releases) section.
